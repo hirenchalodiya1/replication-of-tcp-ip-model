@@ -7,7 +7,7 @@ def log(msg, verbosity=1):
         print(msg)
 
 
-def load_class(path):
+def load(path):
     module, klass = path.rsplit('.', 1)
     m = import_module(module)
     cls = getattr(m, klass)
