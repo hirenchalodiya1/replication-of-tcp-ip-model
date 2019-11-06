@@ -1,8 +1,7 @@
 # import threading
 from core.user.client.connection import create_connection
-from core.middleware.str2byte import str2bytes
 from core.middleware.checks.crc import CRC
-from core.middleware.encode_decode import encode, decode
+from core.middleware.str_byte_conversion import str2bytes, bytes2str, str2bits
 import sys
 
 
@@ -15,7 +14,7 @@ def receive(socket, signal):
     while signal:
         try:
             data = socket.recv(32)
-            print(decode(data))
+            print(bytes2str(data))
         except:
             print("You have been disconnected from the server")
             signal = False
@@ -35,11 +34,11 @@ def run_client():
             input_string = input("Enter data you want to send: ")
 
             # Convert input data to byte form
-            byte_message = str2bytes(input_string)
-            print("Data in bytes form:", byte_message)
+            inp_str_as_bits = str2bits(input_string)
+            print("Data in bytes form:", inp_str_as_bits)
 
             # Encoded data
-            enc_data = apply_check_encoding(byte_message)
+            enc_data = apply_check_encoding(inp_str_as_bits)
 
             # Function to corrupt the data
             # enc_data = "101010"
@@ -47,11 +46,11 @@ def run_client():
             print("Encoded Data in bytes form:", enc_data)
 
             # Send the input data
-            sock.sendall(encode(enc_data))
+            sock.sendall(str2bytes(enc_data))
 
             # receive data from the server
             recv_data = sock.recv(1024)
-            print(("Received message from the server: " + decode(recv_data)))
+            print(("Received message from the server: " + bytes2str(recv_data)))
 
     except (KeyboardInterrupt, EOFError):
         sock.close()
