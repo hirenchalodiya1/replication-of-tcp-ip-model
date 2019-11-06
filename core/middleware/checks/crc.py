@@ -5,10 +5,11 @@ from core.middleware.mod2div import mod2div
 # by appending remainder of modular division
 # at the end of data and returning
 class CRC:
-    def __init__(self, data, key):
+    def __init__(self, data):
         self.data = data
-        self.key = key
+        self.key = "1001"
         self.remainder = ''
+        self.divide()
 
     def divide(self):
         l_key = len(self.key)
@@ -17,8 +18,15 @@ class CRC:
         appended_data = self.data + '0' * (l_key - 1)
         self.remainder = mod2div(appended_data, self.key)
 
-    def remainder(self):
-        return self.remainder
-
     def codeword(self):
         return self.data + self.remainder
+
+    def encode(self):
+        return self.data + self.remainder
+
+    def decode(self):
+        zeroes = "0" * (len(self.key) - 1)
+        if self.remainder == zeroes:
+            return self.data, self.remainder
+        else:
+            return ""
