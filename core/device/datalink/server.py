@@ -1,6 +1,6 @@
 import settings
 from core.utils import load
-from core.middleware.str_byte_conversion import bits2str
+from core.utils.str_byte_conversion import bits2str
 
 
 def server_dll(frames):

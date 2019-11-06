@@ -1,4 +1,5 @@
-from core.middleware.mod2div import mod2div
+import settings
+from core.utils.mod2div import mod2div
 
 
 # Class used to apply crc to the data
@@ -7,7 +8,7 @@ from core.middleware.mod2div import mod2div
 class CRC:
     def __init__(self, data):
         self.data = data
-        self.key = "1001"
+        self.key = settings.CRC_KEY
         self.remainder = ''
         self.divide()
 

@@ -1,6 +1,6 @@
 import settings
 from core.utils import load
-from core.middleware.str_byte_conversion import str2bits
+from core.utils.str_byte_conversion import str2bits
 
 
 def make_frames(data):
