@@ -1,8 +1,7 @@
 import threading
 from core.utils import log
-
 from core.middleware.checks.crc import CRC
-from core.middleware.str_byte_conversion import str2bytes, bytes2str
+from core.middleware.str_byte_conversion import str2bytes, bytes2str, bits2str
 
 
 # Function used at the receiver side to decode data
@@ -50,14 +49,20 @@ class Client(threading.Thread):
 
             if data != "":
                 recv_data = bytes2str(data)
-                print("Data from the client with ID " + str(self.id) + " is " + recv_data)
-                dec_data = apply_check_decoding(recv_data)
+
+                print(
+                    "Client " + str(self.id) + ": " + "Decoded Data from the client (in bits) is " + recv_data)
+                dec_data_bits = apply_check_decoding(recv_data)
 
                 # If remainder is all zeros then no error occurred
-                if dec_data != "":
-                    self.socket.sendall(str2bytes("No error found."))
+                if dec_data_bits != "":
+                    err_msg = "No error found."
+                    print(
+                        "Client " + str(self.id) + ": " + "Decoded Data from the client is " + bits2str(dec_data_bits))
                 else:
-                    self.socket.sendall(str2bytes("Error in data."))
+                    err_msg = "Error in data."
+                print("Client " + str(self.id) + ": " + err_msg)
+                self.socket.sendall(str2bytes(err_msg))
 
 
 def new_connections(sock):
