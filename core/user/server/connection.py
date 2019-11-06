@@ -1,4 +1,14 @@
 import threading
+from core.utils import log
+
+from core.middleware.checks.crc import CRC
+from core.middleware.encode_decode import encode, decode
+
+
+# Function used at the receiver side to decode data
+def apply_check_decoding(data):
+    return CRC(data).decode()
+
 
 from core.middleware.checks.crc import CRC
 from core.middleware.encode_decode import encode, decode
@@ -39,9 +49,9 @@ class Client(threading.Thread):
             try:
                 data = self.socket.recv(1024)
                 if data == b'':
-                    raise
-            except:
-                print("Client " + str(self.address) + " has disconnected")
+                    raise ConnectionResetError
+            except ConnectionResetError:
+                log("Client " + str(self.address) + " has disconnected")
                 self.signal = False
                 self.socket.close()
                 connections.remove(self)
@@ -50,26 +60,21 @@ class Client(threading.Thread):
             if data != "":
                 recv_data = decode(data)
                 print("Data from the client with ID " + str(self.id) + " is " + recv_data)
-
-                dec_data, remainder = apply_check_decoding(recv_data)
-                print("Remainder after decoding is: " + remainder)
+                dec_data = apply_check_decoding(recv_data)
 
                 # If remainder is all zeros then no error occurred
-                temp = "0" * (len(key) - 1)
-
-                for client in connections:
-                    if client.id == self.id:
-                        if remainder == temp:
-                            client.socket.sendall(encode("No error found."))
-                        else:
-                            client.socket.sendall(encode("Error in data."))
-
-
+                if dec_data != "":
+                    self.socket.sendall(encode("No error found."))
+                else:
+                    self.socket.sendall(encode("Error in data."))
 def new_connections(sock):
-    while True:
-        c_sock, address = sock.accept()
-        global total_connections
-        connections.append(Client(c_sock, address, total_connections, "Name", True))
-        connections[len(connections) - 1].start()
-        print("New connection at ID " + str(connections[len(connections) - 1]))
-        total_connections += 1
+    try:
+        while True:
+            c_sock, address = sock.accept()
+            global total_connections
+            connections.append(Client(c_sock, address, total_connections, "Name", True))
+            connections[len(connections) - 1].start()
+            log("New connection at ID " + str(connections[len(connections) - 1]))
+            total_connections += 1
+    except (KeyboardInterrupt, EOFError):
+        pass
