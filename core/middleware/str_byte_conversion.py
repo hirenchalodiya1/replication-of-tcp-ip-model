@@ -1,5 +1,11 @@
 def str2bits(string):
-    return ''.join(format(ord(x), 'b') for x in string)
+    res = ""
+    for x in string:
+        bits = ''.join(format(ord(x), 'b'))
+        while len(bits) != 8:
+            bits = '0' + bits
+        res += str(bits)
+    return res
 
 
 def bits2str(string):
