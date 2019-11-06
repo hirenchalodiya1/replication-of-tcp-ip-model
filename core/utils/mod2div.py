@@ -1,4 +1,4 @@
-from core.middleware.xor import xor
+from core.utils.xor import xor
 
 
 # Performs Modulo-2 division

@@ -1,9 +1,9 @@
+import settings
 from importlib import import_module
-VERBOSITY = 1
 
 
 def log(msg, verbosity=1):
-    if verbosity >= VERBOSITY:
+    if verbosity >= settings.VERBOSITY:
         print(msg)
 
 

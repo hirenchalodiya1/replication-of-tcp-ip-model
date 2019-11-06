@@ -1,7 +1,7 @@
 import threading
 from core.utils import log
 from core.middleware.checks.crc import CRC
-from core.middleware.str_byte_conversion import str2bytes, bytes2str, bits2str
+from core.utils.str_byte_conversion import str2bytes, bytes2str, bits2str
 
 
 # Function used at the receiver side to decode data

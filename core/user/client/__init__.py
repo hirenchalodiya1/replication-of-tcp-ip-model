@@ -1,7 +1,7 @@
 # import threading
 from core.user.client.connection import create_connection
 from core.middleware.checks.crc import CRC
-from core.middleware.str_byte_conversion import str2bytes, bytes2str, str2bits
+from core.utils.str_byte_conversion import str2bytes, bytes2str, str2bits
 import sys
 
 
