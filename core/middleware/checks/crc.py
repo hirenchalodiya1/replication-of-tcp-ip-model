@@ -26,8 +26,8 @@ class CRC:
 
     def decode(self):
         zeroes = "0" * (len(self.key) - 1)
+        print("Remainder after decoding is: " + self.remainder)
         if self.remainder == zeroes:
-            print("Remainder after decoding is: " + self.remainder)
             return self.data[:-(len(self.key) - 1)]
         else:
             return ""
