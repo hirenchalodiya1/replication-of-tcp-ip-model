@@ -1,6 +1,15 @@
 import threading
 from core.utils import log
 
+from core.middleware.checks.crc import CRC
+from core.middleware.encode_decode import encode, decode
+
+
+# Function used at the receiver side to decode data
+def apply_check_decoding(data):
+    return CRC(data).decode()
+
+
 # Variables for holding information about connections
 connections = []
 total_connections = 0
@@ -29,7 +38,7 @@ class Client(threading.Thread):
     def run(self):
         while self.signal:
             try:
-                data = self.socket.recv(32)
+                data = self.socket.recv(1024)
                 if data == b'':
                     raise ConnectionResetError
             except ConnectionResetError:
@@ -40,13 +49,18 @@ class Client(threading.Thread):
                 break
 
             if data != "":
-                log("ID " + str(self.id) + ": " + str(data.decode("utf-8")))
-                for client in connections:
-                    if client.id != self.id:
-                        client.socket.sendall(data)
+                recv_data = decode(data)
+                print("Data from the client with ID " + str(self.id) + " is " + recv_data)
+
+                dec_data = apply_check_decoding(recv_data)
+
+                # If remainder is all zeros then no error occurred
+                if dec_data != "":
+                    self.socket.sendall(encode("No error found."))
+                else:
+                    self.socket.sendall(encode("Error in data."))
 
 
-# Wait for new connections
 def new_connections(sock):
     try:
         while True:
