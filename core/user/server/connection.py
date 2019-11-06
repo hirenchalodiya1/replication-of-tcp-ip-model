@@ -2,16 +2,7 @@ import threading
 from core.utils import log
 
 from core.middleware.checks.crc import CRC
-from core.middleware.encode_decode import encode, decode
-
-
-# Function used at the receiver side to decode data
-def apply_check_decoding(data):
-    return CRC(data).decode()
-
-
-from core.middleware.checks.crc import CRC
-from core.middleware.encode_decode import encode, decode
+from core.middleware.str_byte_conversion import str2bytes, bytes2str
 
 
 # Function used at the receiver side to decode data
@@ -58,15 +49,17 @@ class Client(threading.Thread):
                 break
 
             if data != "":
-                recv_data = decode(data)
+                recv_data = bytes2str(data)
                 print("Data from the client with ID " + str(self.id) + " is " + recv_data)
                 dec_data = apply_check_decoding(recv_data)
 
                 # If remainder is all zeros then no error occurred
                 if dec_data != "":
-                    self.socket.sendall(encode("No error found."))
+                    self.socket.sendall(str2bytes("No error found."))
                 else:
-                    self.socket.sendall(encode("Error in data."))
+                    self.socket.sendall(str2bytes("Error in data."))
+
+
 def new_connections(sock):
     try:
         while True:
