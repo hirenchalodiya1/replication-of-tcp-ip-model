@@ -9,7 +9,12 @@ def str2bits(string):
 
 
 def bits2str(string):
-    pass
+    data = ""
+    for i in range(0, len(string), 8):
+        j = min(i+8, len(string))
+        char = chr(int(string[i:j], 2))
+        data += char
+    return data
 
 
 def str2bytes(string):
