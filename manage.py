@@ -1,4 +1,6 @@
 import sys
+from core.user.server import run_server
+from core.user.client import run_client
 
 
 if __name__ == "__main__":
@@ -7,10 +9,8 @@ if __name__ == "__main__":
         raise Exception("Please Provide valid number of argument")
     command = args[1]
     if command == "server":
-        # run server code
-        pass
+        run_server()
     elif command == "client":
-        # run client code
-        pass
+        run_client()
     else:
         raise Exception("Invalid argument [server | client]")
