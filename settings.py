@@ -1,3 +1,1 @@
-"""
-All necessary settings will be written here
-"""
+ERROR_CHECKING = "core.middleware.checks.crc.CRC"

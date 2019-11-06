@@ -1,4 +1,5 @@
 import threading
+from core.utils import log
 
 # Variables for holding information about connections
 connections = []
@@ -30,17 +31,16 @@ class Client(threading.Thread):
             try:
                 data = self.socket.recv(32)
                 if data == b'':
-                    raise
-            except:
-                print("Client " + str(self.address) + " has disconnected")
+                    raise ConnectionResetError
+            except ConnectionResetError:
+                log("Client " + str(self.address) + " has disconnected")
                 self.signal = False
                 self.socket.close()
                 connections.remove(self)
                 break
 
             if data != "":
-                print("hello")
-                print("ID " + str(self.id) + ": " + str(data.decode("utf-8")))
+                log("ID " + str(self.id) + ": " + str(data.decode("utf-8")))
                 for client in connections:
                     if client.id != self.id:
                         client.socket.sendall(data)
@@ -48,10 +48,13 @@ class Client(threading.Thread):
 
 # Wait for new connections
 def new_connections(sock):
-    while True:
-        c_sock, address = sock.accept()
-        global total_connections
-        connections.append(Client(c_sock, address, total_connections, "Name", True))
-        connections[len(connections) - 1].start()
-        print("New connection at ID " + str(connections[len(connections) - 1]))
-        total_connections += 1
+    try:
+        while True:
+            c_sock, address = sock.accept()
+            global total_connections
+            connections.append(Client(c_sock, address, total_connections, "Name", True))
+            connections[len(connections) - 1].start()
+            log("New connection at ID " + str(connections[len(connections) - 1]))
+            total_connections += 1
+    except (KeyboardInterrupt, EOFError):
+        pass
