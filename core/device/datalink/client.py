@@ -15,9 +15,13 @@ def client_dll(msg):
     data = str2bits(msg)
     checks = load(settings.ERROR_CHECKING)
     error_generator = load(settings.ERROR_GENERATOR)
+    framer = load(settings.FRAMING_SCHEME)
 
     frames = make_frames(data)
     frames_to_send = []
-    for i in frames:
-        frames_to_send.append(error_generator(checks(i).encode()))
+    for frame in frames:
+        encoded_ = checks(frame).encode()
+        errored_ = error_generator(encoded_)
+        framed_ = framer().en_frame(errored_)
+        frames_to_send.append(framed_)
     return frames_to_send
