@@ -16,3 +16,4 @@ ERROR_DISTRIBUTION = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 # Frame Settings
 PACKET_SIZE = 32
+FRAME_SIZE = PACKET_SIZE + len(CRC_KEY) - 1

@@ -1,13 +1,8 @@
 import threading
 from core.utils import log
-from core.middleware.checks.crc import CRC
 from core.utils.str_byte_conversion import str2bytes, bytes2str, bits2str
-
-
-# Function used at the receiver side to decode data
-def apply_check_decoding(data):
-    return CRC(data).decode()
-
+from core.device.datalink.server import server_dll
+import settings
 
 # Variables for holding information about connections
 connections = []
@@ -25,6 +20,9 @@ class Client(threading.Thread):
         self.id = id_
         self.name = name
         self.signal = signal
+        self.frames = []
+        self.num_of_frames = 0
+        self.error = False
 
     def __str__(self):
         return str(self.id) + " " + str(self.address)
@@ -37,9 +35,19 @@ class Client(threading.Thread):
     def run(self):
         while self.signal:
             try:
-                data = self.socket.recv(1024)
-                if data == b'':
-                    raise ConnectionResetError
+                if self.socket.sendall(b'100100100100100') == 0:
+                    raise ConnectionAbortedError
+                frame = ""
+                while True:
+                    chunk = self.socket.recv(settings.FRAME_SIZE)
+                    if frame == b'':
+                        break
+                    frame = bytes2str(chunk)
+                    self.frames.append(str(frame))
+                    print(self.frames)
+                    err_msg = self.check_data()
+                    self.display(err_msg)
+                    self.return_data(err_msg)
             except ConnectionResetError:
                 log("Client " + str(self.address) + " has disconnected")
                 self.signal = False
@@ -47,22 +55,54 @@ class Client(threading.Thread):
                 connections.remove(self)
                 break
 
-            if data != "":
-                recv_data = bytes2str(data)
+            # if frame != "":
+            # if self.error:
+            #     if self.num_of_frames > 0:
+            #         self.num_of_frames -= 1
+            #     else:
+            #         self.error = False
+            # else:
+            # if self.num_of_frames == 0:
+            #     self.set_len_rec_frames(frame)
+            # else:
+            #     if len(self.frames) < self.num_of_frames:
+            #         dec_frame = bytes2str(frame)
+            #         self.frames.append(str(dec_frame))
 
-                print(
-                    "Client " + str(self.id) + ": " + "Decoded Data from the client (in bits) is " + recv_data)
-                dec_data_bits = apply_check_decoding(recv_data)
+            # Check data if all the frames are received
+            # if self.num_of_frames != 0 and len(self.frames) == self.num_of_frames:
+            #     err_msg = self.check_data()
+            #     self.display(err_msg)
+            #     self.return_data(err_msg)
 
-                # If remainder is all zeros then no error occurred
-                if dec_data_bits != "":
-                    err_msg = "No error found."
-                    print(
-                        "Client " + str(self.id) + ": " + "Decoded Data from the client is " + bits2str(dec_data_bits))
-                else:
-                    err_msg = "Error in data."
-                print("Client " + str(self.id) + ": " + err_msg)
-                self.socket.sendall(str2bytes(err_msg))
+    def set_len_rec_frames(self, frame):
+        num_frames_bits = [bytes2str(frame)]
+        num_frames = server_dll(num_frames_bits)
+        self.num_of_frames = int(num_frames)
+
+    def check_data(self):
+        dec_data = server_dll(self.frames)
+
+        if dec_data != "":
+            err_msg = "No error found."
+            self.display("Decoded Data from the client is " + dec_data)
+        else:
+            err_msg = "Error in data."
+
+            # self.num_of_frames -= len(self.frames)
+            # self.error = True
+        self.reset_data()
+        return err_msg
+
+    def return_data(self, data):
+        self.socket.sendall(str2bytes(data))
+
+    def reset_data(self):
+        self.frames.clear()
+        self.num_of_frames = 0
+
+    def display(self, msg):
+        log("Client " + str(self.id) + ": " + msg)
 
 
 def new_connections(sock):
