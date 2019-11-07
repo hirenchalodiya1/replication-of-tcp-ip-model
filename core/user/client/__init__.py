@@ -1,12 +1,13 @@
+import sys
+import settings
 from core.user.client.connection import create_connection
 from core.utils.str_byte_conversion import str2bytes
-import sys
 from core.device.datalink.client import client_dll
 
 
 def run_client():
-    host = 'localhost'
-    port = 6784
+    host = settings.SERVER_HOST
+    port = settings.SERVER_PORT
     sock = create_connection((host, port))
 
     # Send data to server

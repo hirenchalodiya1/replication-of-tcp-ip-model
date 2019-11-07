@@ -1,11 +1,12 @@
 import socket
+import settings
 from core.user.server.connection import new_connections
 
 
 def run_server():
     # Get host and port
-    host = "localhost"
-    port = 6784
+    host = settings.SERVER_HOST
+    port = settings.SERVER_PORT
 
     # Create new server socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
