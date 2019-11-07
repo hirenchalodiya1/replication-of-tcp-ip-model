@@ -20,9 +20,10 @@ class Client(threading.Thread):
         self.id = id_
         self.name = name
         self.signal = signal
-        self.frames = []
+        self.frames = ""
         self.num_of_frames = 0
         self.error = False
+        self.socket.settimeout(0.1)
 
     def __str__(self):
         return str(self.id) + " " + str(self.address)
@@ -36,19 +37,22 @@ class Client(threading.Thread):
         while self.signal:
             try:
                 if self.socket.sendall(b'100100100100100') == 0:
-                    raise ConnectionAbortedError
-                frame = ""
+                    raise ConnectionResetError
                 while True:
-                    chunk = self.socket.recv(settings.FRAME_SIZE)
-                    if frame == b'':
+                    try:
+                        chunk = self.socket.recv(2048)
+                    except:
                         break
                     frame = bytes2str(chunk)
-                    self.frames.append(str(frame))
+                    self.frames += str(frame)
                     print(self.frames)
-                    err_msg = self.check_data()
-                    self.display(err_msg)
-                    self.return_data(err_msg)
-            except ConnectionResetError:
+                if self.frames == "":
+                    continue
+                err_msg = self.check_data()
+                self.display(err_msg)
+                self.reset_data()
+                self.return_data(err_msg)
+            except (ConnectionResetError, BrokenPipeError):
                 log("Client " + str(self.address) + " has disconnected")
                 self.signal = False
                 self.socket.close()
@@ -98,7 +102,7 @@ class Client(threading.Thread):
         self.socket.sendall(str2bytes(data))
 
     def reset_data(self):
-        self.frames.clear()
+        self.frames = ""
         self.num_of_frames = 0
 
     def display(self, msg):
