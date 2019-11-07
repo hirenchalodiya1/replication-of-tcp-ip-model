@@ -3,7 +3,7 @@ from importlib import import_module
 
 
 def log(msg, verbosity=1):
-    if verbosity >= settings.VERBOSITY:
+    if verbosity <= settings.VERBOSITY:
         print(msg)
 
 
