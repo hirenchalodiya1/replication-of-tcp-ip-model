@@ -2,9 +2,9 @@ import settings
 from importlib import import_module
 
 
-def log(msg, verbosity=1):
+def log(msg, verbosity=1, **kwargs):
     if verbosity <= settings.VERBOSITY:
-        print(msg)
+        print(msg, **kwargs)
 
 
 def load(path):
