@@ -1,13 +1,14 @@
-# import threading
-from core.user.client.connection import create_connection
-from core.utils.str_byte_conversion import str2bytes, bytes2str
 import sys
+import settings
+from core.utils import log
+from core.user.client.connection import create_connection
+from core.utils.str_byte_conversion import str2bytes
 from core.device.datalink.client import client_dll
 
 
 def run_client():
-    host = 'localhost'
-    port = 6784
+    host = settings.SERVER_HOST
+    port = settings.SERVER_PORT
     sock = create_connection((host, port))
 
     # Send data to server
@@ -18,7 +19,8 @@ def run_client():
 
             # Convert data to list of frames
             enc_frames = client_dll(orig_data)
-            print(enc_frames)
+            log("Frames to be send: ", 2, end="")
+            log(enc_frames, 2)
 
             # Send number of frames
             # num_of_frames = str(len(enc_frames))
@@ -35,4 +37,5 @@ def run_client():
 
     except (KeyboardInterrupt, EOFError):
         sock.close()
+        print()
         sys.exit(0)

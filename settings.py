@@ -1,3 +1,7 @@
+# server host and port
+SERVER_HOST = "localhost"
+SERVER_PORT = 6784
+
 # verbosity
 VERBOSITY = 1
 

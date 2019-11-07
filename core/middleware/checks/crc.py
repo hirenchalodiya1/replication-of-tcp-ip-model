@@ -1,4 +1,5 @@
 import settings
+from core.utils import log
 from core.utils.mod2div import mod2div
 
 
@@ -23,11 +24,16 @@ class CRC:
         return self.data + self.remainder
 
     def encode(self):
+        log("Encoding data...", 4)
+        log("Data: %s" % self.data, 4)
+        log("Remainder: %s" % self.remainder, 3)
         return self.data + self.remainder
 
     def decode(self):
         zeroes = "0" * (len(self.key) - 1)
-        print("Remainder after decoding is: " + self.remainder)
+        log("Decoding data...", 4)
+        log("Data: %s" % self.data, 4)
+        log("Remainder: %s" % self.remainder, 3)
         if self.remainder == zeroes:
             return self.data[:-(len(self.key) - 1)]
         else:
