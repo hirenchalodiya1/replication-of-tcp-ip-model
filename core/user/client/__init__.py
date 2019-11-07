@@ -3,7 +3,6 @@ from core.user.client.connection import create_connection
 from core.utils.str_byte_conversion import str2bytes, bytes2str
 import sys
 from core.device.datalink.client import client_dll
-import settings
 
 
 def run_client():
