@@ -1,7 +1,6 @@
 import sys
 from core.user.server import run_server
 from core.user.client import run_client
-import core.device.datalink
 
 
 if __name__ == "__main__":
@@ -13,7 +12,5 @@ if __name__ == "__main__":
         run_server()
     elif command == "client":
         run_client()
-    elif command == "test":
-        pass
     else:
         raise Exception("Invalid argument [server | client]")

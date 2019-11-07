@@ -1,6 +1,5 @@
-# import threading
 from core.user.client.connection import create_connection
-from core.utils.str_byte_conversion import str2bytes, bytes2str
+from core.utils.str_byte_conversion import str2bytes
 import sys
 from core.device.datalink.client import client_dll
 
