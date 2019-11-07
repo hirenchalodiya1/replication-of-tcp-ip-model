@@ -2,6 +2,7 @@ import threading
 from core.utils import log
 from core.utils.str_byte_conversion import str2bytes, bytes2str
 from core.device.datalink.server import server_dll
+from core.device.physical.server import server_physical
 
 # Variables for holding information about connections
 connections = []
@@ -81,11 +82,13 @@ class Client(threading.Thread):
 
     def check_data(self):
         log("Client %s: '%s' bits received" % (str(self.id), self.frames), 2)
-        dec_data = server_dll(self.frames)
+        dec_data = server_physical(self.frames)
+        log("Client %s: '%s' bits decoded" % (str(self.id), dec_data), 2)
+        de_frame_data = server_dll(dec_data)
 
-        if dec_data != "":
+        if de_frame_data != "":
             err_msg = "No error found."
-            self.display("Decoded data from client: " + dec_data)
+            self.display("Decoded data from client: " + de_frame_data)
         else:
             err_msg = "Error in data."
         self.reset_data()

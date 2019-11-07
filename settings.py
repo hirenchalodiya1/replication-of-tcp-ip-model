@@ -21,3 +21,6 @@ ERROR_DISTRIBUTION = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 # Frame Settings
 PACKET_SIZE = 32
 FRAMING_SCHEME = "core.middleware.framer.bit_stuffing.BitStuffing"
+
+# Line Coding Schemes
+LINE_CODING_SCHEME = "core.middleware.coding_schemes.manchester.Manchester"
