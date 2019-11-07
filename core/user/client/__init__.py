@@ -1,24 +1,9 @@
 # import threading
 from core.user.client.connection import create_connection
-from core.middleware.checks.crc import CRC
-from core.utils.str_byte_conversion import str2bytes, bytes2str, str2bits
+from core.utils.str_byte_conversion import str2bytes, bytes2str
 import sys
-
-
-# Function used at the sender side to encode data
-def apply_check_encoding(data):
-    return CRC(data).encode()
-
-
-def receive(socket, signal):
-    while signal:
-        try:
-            data = socket.recv(32)
-            print(bytes2str(data))
-        except:
-            print("You have been disconnected from the server")
-            signal = False
-            break
+from core.device.datalink.client import client_dll
+import settings
 
 
 def run_client():
@@ -27,30 +12,27 @@ def run_client():
     sock = create_connection((host, port))
 
     # Send data to server
-    # str.encode is used to turn the string message into bytes so it can be sent across the network
     try:
         while True:
             # Input data to send
-            input_string = input("Enter data you want to send: ")
+            orig_data = input("Enter data you want to send: ")
 
-            # Convert input data to byte form
-            inp_str_as_bits = str2bits(input_string)
-            print("Data in bytes form:", inp_str_as_bits)
+            # Convert data to list of frames
+            enc_frames = client_dll(orig_data)
+            print(enc_frames)
 
-            # Encoded data
-            enc_data = apply_check_encoding(inp_str_as_bits)
+            # Send number of frames
+            # num_of_frames = str(len(enc_frames))
+            # encode_num_of_frames = client_dll(num_of_frames)[0]
+            # sock.sendall(str2bytes(encode_num_of_frames))
 
-            # Function to corrupt the data
-            # enc_data = "101010"
-
-            print("Encoded Data in bytes form:", enc_data)
-
-            # Send the input data
-            sock.sendall(str2bytes(enc_data))
+            # Send the frames
+            for frame in enc_frames:
+                sock.sendall(str2bytes(frame))
 
             # receive data from the server
-            recv_data = sock.recv(1024)
-            print(("Received message from the server: " + bytes2str(recv_data)))
+            # recv_data = sock.recv(settings.PACKET_SIZE)
+            # print(("Received message from the server: " + bytes2str(recv_data)))
 
     except (KeyboardInterrupt, EOFError):
         sock.close()
