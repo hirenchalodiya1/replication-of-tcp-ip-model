@@ -33,7 +33,7 @@ class Client(threading.Thread):
     def run(self):
         while self.signal:
             try:
-                if self.socket.sendall(b'100100100100100') == 0:
+                if self.socket.sendall(b'11111111') == 0:
                     raise ConnectionResetError
                 while True:
                     try:
@@ -42,12 +42,10 @@ class Client(threading.Thread):
                         break
                     frame = bytes2str(chunk)
                     self.frames += str(frame)
-                    print(self.frames)
                 if self.frames == "":
                     continue
                 err_msg = self.check_data()
                 self.display(err_msg)
-                self.reset_data()
                 self.return_data(err_msg)
             except (ConnectionResetError, BrokenPipeError):
                 log("Client " + str(self.address) + " has disconnected")
@@ -82,16 +80,14 @@ class Client(threading.Thread):
         self.num_of_frames = int(num_frames)
 
     def check_data(self):
+        log("Client %s: '%s' bits received" % (str(self.id), self.frames), 2)
         dec_data = server_dll(self.frames)
 
         if dec_data != "":
             err_msg = "No error found."
-            self.display("Decoded Data from the client is " + dec_data)
+            self.display("Decoded data from client: " + dec_data)
         else:
             err_msg = "Error in data."
-
-            # self.num_of_frames -= len(self.frames)
-            # self.error = True
         self.reset_data()
         return err_msg
 
