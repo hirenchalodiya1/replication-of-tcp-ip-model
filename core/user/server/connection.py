@@ -1,8 +1,7 @@
 import threading
 from core.utils import log
-from core.utils.str_byte_conversion import str2bytes, bytes2str, bits2str
+from core.utils.str_byte_conversion import str2bytes, bytes2str
 from core.device.datalink.server import server_dll
-import settings
 
 # Variables for holding information about connections
 connections = []
@@ -30,9 +29,7 @@ class Client(threading.Thread):
 
     # Attempt to get data from client
     # If unable to, assume client has disconnected and remove him from server data
-    # If able to and we get data back, print it in the server and send it back to every
-    # client aside from the client that has sent it
-    # .decode is used to convert the byte data into a printable string
+    # If able to and we get data back, print it in the server
     def run(self):
         while self.signal:
             try:
@@ -41,7 +38,7 @@ class Client(threading.Thread):
                 while True:
                     try:
                         chunk = self.socket.recv(2048)
-                    except:
+                    except OSError:
                         break
                     frame = bytes2str(chunk)
                     self.frames += str(frame)
