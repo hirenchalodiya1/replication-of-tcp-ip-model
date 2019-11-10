@@ -3,10 +3,10 @@ from core.utils import load
 from core.utils.str_byte_conversion import str2bits
 
 
-def make_frames(data):
+def make_packets(data):
     frames = []
     for i in range(0, len(data), settings.PACKET_SIZE):
-        j = min(i+settings.PACKET_SIZE, len(data))
+        j = min(i + settings.PACKET_SIZE, len(data))
         frames.append(data[i:j])
     return frames
 
@@ -17,10 +17,10 @@ def client_dll(msg):
     error_generator = load(settings.ERROR_GENERATOR)
     framer = load(settings.FRAMING_SCHEME)
 
-    frames = make_frames(data)
+    packets = make_packets(data)
     frames_to_send = []
-    for frame in frames:
-        encoded_ = checks(frame).encode()
+    for packet in packets:
+        encoded_ = checks(packet).encode()
         errored_ = error_generator(encoded_)
         framed_ = framer().en_frame(errored_)
         frames_to_send.append(framed_)
